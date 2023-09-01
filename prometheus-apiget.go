@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 
 	"gopkg.in/yaml.v2"
 )
@@ -37,15 +38,28 @@ func main() {
 	defer resp.Body.Close()
 
 	// 读取响应
-	var prometheusMetricValue PrometheusMetricValue
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Printf("无法读取HTTP响应：%s\n", err.Error())
-		return prometheusMetricValue, err.Error()
+		return
 	}
 
 	// 打印结果
 	fmt.Println(string(body))
+	//判断告警
+	var prometheusMetricValue PrometheusMetricValue
+	prometheusMetricValue, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	value := prometheusMetricValue.Data.Result.Value[2]
+	values, err := strconv.Atoi(value)
+	threshold := config.PrometheusInfo.Threshold
+	if values > threshold {
+		fmt.Printf("mtric %s超出阈值%s \n 当前值为%s", value, threshold, value)
+
+	}
 
 }
 
