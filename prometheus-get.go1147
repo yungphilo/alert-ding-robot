@@ -1,0 +1,68 @@
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"os"
+
+	"gopkg.in/yaml.v2"
+)
+
+var httpClient = &http.Client{}
+
+type Config struct {
+	ProURL string `yaml:"url"`
+	Metric string `yaml:"metric"`
+}
+
+// func Getvalue(cfg, *Config, interface{}) (Messagedata, error) {
+// 	var messageData Messagedata
+// 	url := fmt.Sprintf("%s%s", cfg.ProURL, cfg.Metric)
+// 	req, err := http.NewRequest("GET", url, nil)
+// 	if err != nil {
+// 		return messageData, err
+// 	}
+// 	resp, err := httpClient.Do(req)
+// 	if err != nil {
+// 		return messageData, err
+// 	}
+// 	defer resp.Body.Close()
+// 	err = json.NewDecoder(resp.Body).Decode(&messageData)
+// 	return messageData, err
+
+// }
+url := cfg.ProURL
+req, _ := http.NewRequest("GET", url, nil)
+
+response, err := http.DefaultClient.Do(req)
+
+func (c *Client) Get(url string) (resp *REsponse, err error) {
+	req, err := NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	return c.Do(req)
+}
+func loadConfig(filename string) (*Config, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg := Config{}
+	err = yaml.Unmarshal(data, &cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &cfg, nil
+}
+
+func main() {
+	cfg, err := loadConfig("config-a.yaml")
+	if err != nil {
+		fmt.Printf("Failed to load config file: %s\n", err.Error())
+		return
+	}
+	Getvalue()
+}

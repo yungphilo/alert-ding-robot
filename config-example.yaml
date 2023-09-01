@@ -1,0 +1,28 @@
+prometheus:
+  url: "http://grafana.soap.com:9090/api/v1/query?query="
+  metric: process_virtual_memory_bytes
+  threshold: 1173188600
+
+dingtalk_webhook: "https://oapi.dingtalk.com/robot/send?access_token=xxxxxxx"
+dingmessage:
+  msgtype: "actionCard"
+  actionCard: 
+    title: "disk alert test"
+    text: "@1xxxxxxxxx1 \n"
+    singleTitle: "消息测试"
+    singleURL: "https://grafana.soap.com/d/TCQhwXeVk/pod-disk-info?orgId=1&refresh=1m&from=now-15m&to=now"
+  at:
+    atMobiles: 
+      - 1xxxxxxxxx1
+    atUserIds: 
+      - 张三
+    isAtAll: false
+alerts:
+  - metric: "up{job=\"kubernetes-pods\"}"
+    pod_prefix: "grafana"
+    at_user_list:
+      - "1xxxxxxxxx1"
+    threshold: 0.95
+    window: 5m
+    for: 2m
+    every: 10s

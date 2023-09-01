@@ -1,0 +1,97 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"strings"
+
+	"gopkg.in/yaml.v2"
+)
+
+type Config struct {
+	DingtalkWebhook string `yaml:"dingtalk_webhook"`
+	Message         struct {
+		MsgType    string `yaml:"msgtype"`
+		ActionCard struct {
+			Text        string `yaml:"text"`
+			Title       string `yaml:"title"`
+			SingleTitle string `yaml:"singleTitle"`
+			SingleURL   string `yaml:"singleURL"`
+		} `yaml:"actionCard"`
+		At struct {
+			AtMobiles []string `yaml:"atMobiles"`
+			AtUserIds []string `yaml:"atUserIds"`
+			IsAtAll   bool     `yaml:"isAtAll"`
+		} `yaml:"at"`
+	} `yaml:"dingmessage"`
+}
+
+func sendDingtalkMessage(config *Config) error {
+	payload := fmt.Sprintf(`{
+    "msgtype": "%s",
+    "%s": {
+      "title": "%s",
+	  "singleTitle": "%s",
+	  "text": "%s",
+	  "singleURL": "%s"
+    },
+    "at": {
+      "atMobiles": %s,
+      "atUserIds": %s,
+      "isAtAll": %t
+    }
+  }`, config.Message.MsgType, config.Message.MsgType, config.Message.ActionCard.Title, config.Message.ActionCard.SingleTitle, config.Message.ActionCard.Text, config.Message.ActionCard.SingleURL, arrayToJSON(config.Message.At.AtMobiles), arrayToJSON(config.Message.At.AtUserIds), config.Message.At.IsAtAll)
+
+	resp, err := http.Post(config.DingtalkWebhook, "application/json", strings.NewReader(payload))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to send Dingtalk message. StatusCode: %d", resp.StatusCode)
+	}
+
+	return nil
+}
+
+func arrayToJSON(arr []string) string {
+	str := `["` + strings.Join(arr, `","`) + `"]`
+	return str
+}
+
+// func loadConfig(filename string) (*Config, error) {
+// 	data, err := os.ReadFile(filename)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	var cfg Config
+// 	err = yaml.Unmarshal(data, &cfg)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+//		return &cfg, nil
+//	}
+func main() {
+	yamlFile, err := os.ReadFile("config-a.yaml")
+	if err != nil {
+		log.Fatalf("Failed to read YAML file: %v", err)
+	}
+
+	config := Config{}
+	err = yaml.Unmarshal(yamlFile, &config)
+	if err != nil {
+		log.Fatalf("Failed to unmarshal YAML: %v", err)
+	}
+
+	err = sendDingtalkMessage(&config)
+	if err != nil {
+		log.Fatalf("Failed to send Dingtalk message: %v", err)
+	}
+
+	fmt.Println("Dingtalk message sent successfully!")
+}
