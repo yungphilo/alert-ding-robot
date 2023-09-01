@@ -37,14 +37,16 @@ func main() {
 	defer resp.Body.Close()
 
 	// 读取响应
+	var prometheusMetricValue PrometheusMetricValue
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Printf("无法读取HTTP响应：%s\n", err.Error())
-		return
+		return prometheusMetricValue, err.Error()
 	}
 
 	// 打印结果
 	fmt.Println(string(body))
+
 }
 
 func readConfig(filename string) (Config, error) {
