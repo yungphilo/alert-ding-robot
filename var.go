@@ -14,3 +14,10 @@ type PrometheusMetricValue struct {
 		} `json:"result"`
 	} `json:"data"`
 }
+type Config struct {
+	PrometheusInfo struct {
+		URL       string `yaml:"url"`
+		Metric    string `yaml:"metric"`
+		Threshold int    `yaml:"threshold"`
+	} `yaml:"prometheus"`
+}
