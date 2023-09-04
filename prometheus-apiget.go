@@ -57,15 +57,43 @@ func getMetricValue(pomUrl, metric string) (PrometheusMetricValue, error) {
 		return prometheusMetricValue, err
 	}
 	defer resp.Body.Close()
+<<<<<<< HEAD
 	// var prometheusMetricValue PrometheusMetricValue
 	err = json.NewDecoder(resp.Body).Decode(&prometheusMetricValue)
 	if err != nil {
 		fmt.Printf("无法解析http响应：%s\n", err.Error())
 		return prometheusMetricValue, err
+=======
+
+	// 读取响应
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("无法读取HTTP响应：%s\n", err.Error())
+		return
+>>>>>>> 88a5f1c89f02f87f1a0693a2ad9a381f1d6fd2c6
 	}
 	return prometheusMetricValue, err
 
+<<<<<<< HEAD
 }
+=======
+	// 打印结果
+	fmt.Println(string(body))
+	//判断告警
+	var prometheusMetricValue PrometheusMetricValue
+	prometheusMetricValue, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	value := prometheusMetricValue.Data.Result.Value[2]
+	values, err := strconv.Atoi(value)
+	threshold := config.PrometheusInfo.Threshold
+	if values > threshold {
+		fmt.Printf("mtric %s超出阈值%s \n 当前值为%s", value, threshold, value)
+
+	}
+>>>>>>> 88a5f1c89f02f87f1a0693a2ad9a381f1d6fd2c6
 
 // 将interface转成int
 func GetInterfaceToInt(t1 interface{}) int {
