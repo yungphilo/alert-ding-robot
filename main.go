@@ -3,24 +3,18 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
 
-type Config struct {
-	PrometheusInfo struct {
-		URL       string `yaml:"url"`
-		Metric    string `yaml:"metric"`
-		Threshold int    `yaml:"threshold"`
-	} `yaml:"prometheus"`
-}
-
 func main() {
 	// 读取配置文件
-	config, err := readConfig("config-a.yaml")
+	config, err := readConfig("config-text.yaml")
 	if err != nil {
 		fmt.Printf("无法读取配置文件：%s\n", err.Error())
 		return
@@ -40,10 +34,51 @@ func main() {
 	threshold := config.PrometheusInfo.Threshold
 	if values > threshold {
 		fmt.Printf("指标 %s超出阈值：%d \n当前值为：%d", metric, threshold, values)
+		alertmesage := "指标disk：" + metric + "\n超出阈值：" + strconv.Itoa(threshold) + "\n当前值为：" + strconv.Itoa(values) + "\n" + "详情查看：http://grafana.soap.com/d/3Ra1cWRSk/test?orgId=1 \n"
+		fmt.Println(alertmesage)
+		//'"指标 %s超出阈值：%d \n当前值为：%d", metric, threshold, values'
+		err = sendDingtalkMessage(&config, alertmesage)
+		if err != nil {
+			log.Fatalf("Failed to send Dingtalk message: %v", err)
+		}
+
+		fmt.Println("Dingtalk message sent successfully!")
 	} else {
 		fmt.Printf("指标 %s未超出阈值：%d \n当前值为：%d", metric, threshold, values)
 	}
 
+}
+
+// 发送钉钉
+func sendDingtalkMessage(config *Config, alertmesage string) error {
+	payload := fmt.Sprintf(`{
+    "msgtype": "%s",
+    "%s": {
+      "content": "%s"
+    },
+    "at": {
+      "atMobiles": %s,
+      "atUserIds": %s,
+      "isAtAll": %t
+    }
+  }`, config.Message.MsgType, config.Message.MsgType, alertmesage, arrayToJSON(config.Message.At.AtMobiles), arrayToJSON(config.Message.At.AtUserIds), config.Message.At.IsAtAll)
+
+	resp, err := http.Post(config.DingtalkWebhook, "application/json", strings.NewReader(payload))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to send Dingtalk message. StatusCode: %d", resp.StatusCode)
+	}
+
+	return nil
+}
+
+func arrayToJSON(arr []string) string {
+	str := `["` + strings.Join(arr, `","`) + `"]`
+	return str
 }
 
 // 发送请求获取值
@@ -57,43 +92,15 @@ func getMetricValue(pomUrl, metric string) (PrometheusMetricValue, error) {
 		return prometheusMetricValue, err
 	}
 	defer resp.Body.Close()
-<<<<<<< HEAD
 	// var prometheusMetricValue PrometheusMetricValue
 	err = json.NewDecoder(resp.Body).Decode(&prometheusMetricValue)
 	if err != nil {
 		fmt.Printf("无法解析http响应：%s\n", err.Error())
 		return prometheusMetricValue, err
-=======
-
-	// 读取响应
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Printf("无法读取HTTP响应：%s\n", err.Error())
-		return
->>>>>>> 88a5f1c89f02f87f1a0693a2ad9a381f1d6fd2c6
 	}
 	return prometheusMetricValue, err
 
-<<<<<<< HEAD
 }
-=======
-	// 打印结果
-	fmt.Println(string(body))
-	//判断告警
-	var prometheusMetricValue PrometheusMetricValue
-	prometheusMetricValue, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return
-	}
-	value := prometheusMetricValue.Data.Result.Value[2]
-	values, err := strconv.Atoi(value)
-	threshold := config.PrometheusInfo.Threshold
-	if values > threshold {
-		fmt.Printf("mtric %s超出阈值%s \n 当前值为%s", value, threshold, value)
-
-	}
->>>>>>> 88a5f1c89f02f87f1a0693a2ad9a381f1d6fd2c6
 
 // 将interface转成int
 func GetInterfaceToInt(t1 interface{}) int {

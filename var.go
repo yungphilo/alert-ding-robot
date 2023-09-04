@@ -20,4 +20,31 @@ type Config struct {
 		Metric    string `yaml:"metric"`
 		Threshold int    `yaml:"threshold"`
 	} `yaml:"prometheus"`
+	DingtalkWebhook string `yaml:"dingtalk_webhook"`
+	Message         struct {
+		MsgType string `yaml:"msgtype"`
+		Text    struct {
+			Content string `yaml:"content"`
+		} `yaml:"text"`
+		At struct {
+			AtMobiles []string `yaml:"atMobiles"`
+			AtUserIds []string `yaml:"atUserIds"`
+			IsAtAll   bool     `yaml:"isAtAll"`
+		} `yaml:"at"`
+	} `yaml:"dingmessage"`
 }
+
+// type Config struct {
+// 	DingtalkWebhook string `yaml:"dingtalk_webhook"`
+// 	Message         struct {
+// 		MsgType string `yaml:"msgtype"`
+// 		Text    struct {
+// 			Content string `yaml:"content"`
+// 		} `yaml:"text"`
+// 		At struct {
+// 			AtMobiles []string `yaml:"atMobiles"`
+// 			AtUserIds []string `yaml:"atUserIds"`
+// 			IsAtAll   bool     `yaml:"isAtAll"`
+// 		} `yaml:"at"`
+// 	} `yaml:"message"`
+// }
