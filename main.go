@@ -51,7 +51,7 @@ func main() {
 			service := Cutlast(deployment)
 			atmobiles := FindMobiles(service, atalerts)
 			values := GetInterfaceToInt(value)
-			threshold := config.PrometheusInfo.Threshold * 3
+			threshold := config.PrometheusInfo.Threshold
 			//log.Println(deployment)
 			if values > threshold {
 				//fmt.Printf("指标 %s超出阈值：%d \n当前值为：%d", metric, threshold, values)
@@ -63,9 +63,9 @@ func main() {
 				if err != nil {
 					log.Fatalf("Failed to send Dingtalk message: %v", err)
 				}
-				log.Println("Dingtalk message sent successfully!")
+				log.Printf("Dingtalk message sent successfully! @%s", atmobiles)
 			} else {
-				log.Printf("Pod %s指标 %s未超出阈值：%s \n当前值为：%s\n", podName, metric, FormatFileSize(int64(threshold)), FormatFileSize(int64(values)))
+				//log.Printf("Pod %s指标 %s未超出阈值：%s \n当前值为：%s\n", podName, metric, FormatFileSize(int64(threshold)), FormatFileSize(int64(values)))
 			}
 		}
 
