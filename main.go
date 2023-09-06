@@ -49,33 +49,23 @@ func main() {
 			grafanaurl := config.PrometheusInfo.Grafana
 			deployment := promPodDisk.Data.Result[i].Metric.Container
 			service := Cutlast(deployment)
-			svcname, ok := atalerts[service]
-			if ok {
-				fmt.Println(svcname)
-				multmumber := len(atalerts[service])
-				for j := 0; j < multmumber; j++ {
-					phone := atalerts[service][j]
-					fmt.Println(phone)
-				}
-
-			}
+			atmobiles := FindMobiles(service, atalerts)
 			values := GetInterfaceToInt(value)
-			threshold := config.PrometheusInfo.Threshold * 3 * 5
+			threshold := config.PrometheusInfo.Threshold * 3
 			//log.Println(deployment)
 			if values > threshold {
 				//fmt.Printf("指标 %s超出阈值：%d \n当前值为：%d", metric, threshold, values)
 				thresholds := FormatFileSize(int64(threshold))
 				mvalue := FormatFileSize(int64(values))
 				alertmesage := "pod disk 使用告警\n" + "指标pod disk：" + metric + "\nPod Name：" + podName + "\nNameSpace：" + nameSpace + "\n超出阈值：" + thresholds + "\n当前值为：" + mvalue + "\n" + "详情查看：" + grafanaurl
-				//log.Println(alertmesage)
-				//service atalerts[eaatbuy-xxl-job-admin][1]
-				err = SendDingtalkMessage(&config, alertmesage)
+				log.Println(alertmesage)
+				err = SendDingtalkMessage(&config, alertmesage, atmobiles)
 				if err != nil {
 					log.Fatalf("Failed to send Dingtalk message: %v", err)
 				}
-				//log.Println("Dingtalk message sent successfully!")
+				log.Println("Dingtalk message sent successfully!")
 			} else {
-				//log.Printf("Pod %s指标 %s未超出阈值：%s \n当前值为：%s\n", podName, metric, FormatFileSize(int64(threshold)), FormatFileSize(int64(values)))
+				log.Printf("Pod %s指标 %s未超出阈值：%s \n当前值为：%s\n", podName, metric, FormatFileSize(int64(threshold)), FormatFileSize(int64(values)))
 			}
 		}
 

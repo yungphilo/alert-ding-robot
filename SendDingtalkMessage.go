@@ -7,7 +7,7 @@ import (
 )
 
 // 发送钉钉
-func SendDingtalkMessage(config *Config, alertmesage string) error {
+func SendDingtalkMessage(config *Config, alertmesage string, atmobiles []string) error {
 	payload := fmt.Sprintf(`{
     "msgtype": "%s",
     "%s": {
@@ -17,7 +17,7 @@ func SendDingtalkMessage(config *Config, alertmesage string) error {
       "atMobiles": %s,
       "isAtAll": %t
     }
-  }`, config.Message.MsgType, config.Message.MsgType, alertmesage, arrayToJSON(config.Message.At.AtMobiles), config.Message.At.IsAtAll)
+  }`, config.Message.MsgType, config.Message.MsgType, alertmesage, arrayToJSON(atmobiles), config.Message.At.IsAtAll)
 
 	resp, err := http.Post(config.DingtalkWebhook, "application/json", strings.NewReader(payload))
 	if err != nil {
