@@ -1,6 +1,8 @@
 package main
 
-import "time"
+import (
+	"time"
+)
 
 type PrometheusMetricValue struct {
 	Status string `json:"status"`
@@ -63,6 +65,7 @@ type Config struct {
 			IsAtAll   bool     `yaml:"isAtAll"`
 		} `yaml:"at"`
 	} `yaml:"dingmessage"`
+	Atalerts map[string][]string `yaml:"atalerts"`
 }
 
 // type Config struct {
