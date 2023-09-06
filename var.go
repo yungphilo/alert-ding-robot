@@ -48,6 +48,8 @@ type Config struct {
 		Metric    string        `yaml:"metric"`
 		Threshold int           `yaml:"threshold"`
 		Window    time.Duration `yaml:"window"`
+		Minute    time.Duration `yaml:"minute"`
+		Grafana   string        `yaml:"grafanaurl"`
 	} `yaml:"prometheus"`
 	DingtalkWebhook string `yaml:"dingtalk_webhook"`
 	Message         struct {
