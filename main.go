@@ -14,7 +14,12 @@ func main() {
 	//日志配置
 	f, err := os.OpenFile("logs/service.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
 	if err != nil {
-		return
+		fmt.Println("no logs directory，will create path ")
+		err := os.Mkdir("logs", os.ModePerm)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("logs create")
 	}
 	defer func() {
 		f.Close()
@@ -26,7 +31,7 @@ func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 
 	// 读取配置文件
-	config, err := readConfig("config-text.yaml")
+	config, err := readConfig("conf/config.yaml")
 	if err != nil {
 		fmt.Printf("无法读取配置文件：%s\n", err.Error())
 		return
