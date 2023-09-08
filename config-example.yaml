@@ -2,27 +2,18 @@ prometheus:
   url: "http://grafana.soap.com:9090/api/v1/query?query="
   metric: process_virtual_memory_bytes
   threshold: 1173188600
+  expr: >-
+   container_memory_working_set_bytes{image!="",container=~".*order-.*"}/container_spec_memory_limit_bytes{image!="",container=~".*test"} * 100
+  grafanaurl: "http://grafana.soap.com"
 
-dingtalk_webhook: "https://oapi.dingtalk.com/robot/send?access_token=xxxxxxx"
+ding_token: xxxxxxx
+secret: xxxx
 dingmessage:
-  msgtype: "actionCard"
-  actionCard: 
-    title: "disk alert test"
-    text: "@1xxxxxxxxx1 \n"
-    singleTitle: "消息测试"
-    singleURL: "https://grafana.soap.com/d/TCQhwXeVk/pod-disk-info?orgId=1&refresh=1m&from=now-15m&to=now"
+  msgtype: "text"
+  text: 
+    content: "disk alert test \n"
   at:
-    atMobiles: 
-      - 1xxxxxxxxx1
-    atUserIds: 
-      - 张三
     isAtAll: false
-alerts:
-  - metric: "up{job=\"kubernetes-pods\"}"
-    pod_prefix: "grafana"
-    at_user_list:
-      - "1xxxxxxxxx1"
-    threshold: 0.95
-    window: 5m
-    for: 2m
-    every: 10s
+atalerts:
+  eastbuy-bootadmin-service:
+  - 1xxxxxxxxxx

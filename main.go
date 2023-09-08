@@ -55,6 +55,7 @@ func main() {
 			nameSpace := promPodDisk.Data.Result[i].Metric.Namespace
 			grafanaurl := config.PrometheusInfo.Grafana
 			deployment := promPodDisk.Data.Result[i].Metric.Container
+			//deployment名字为服务名字+“-” +环境变量，去掉“-”及后面的环境参数
 			service := Cutlast(deployment)
 			atmobiles := FindMobiles(service, atalerts)
 			values := GetInterfaceToInt(value)
