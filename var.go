@@ -52,8 +52,11 @@ type Config struct {
 		Window    time.Duration `yaml:"window"`
 		Minute    time.Duration `yaml:"minute"`
 		Grafana   string        `yaml:"grafanaurl"`
+		Expr      string        `yaml:"expr"`
 	} `yaml:"prometheus"`
 	DingtalkWebhook string `yaml:"dingtalk_webhook"`
+	Secret          string `yaml:"secret"`
+	Token           string `yaml:"ding_token"`
 	Message         struct {
 		MsgType string `yaml:"msgtype"`
 		Text    struct {

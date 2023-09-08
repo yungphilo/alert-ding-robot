@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -41,9 +42,10 @@ func main() {
 
 	pomUrl := config.PrometheusInfo.URL
 	metric := config.PrometheusInfo.Metric
+	expr := config.PrometheusInfo.Expr
 
 	for {
-		promPodDisk, err := GetMetricValue(pomUrl, metric)
+		promPodDisk, err := GetMetricValue(pomUrl, expr)
 		//fmt.Println(promPodDisk)
 		atalerts := config.Atalerts
 		fmt.Println(atalerts)
@@ -60,8 +62,10 @@ func main() {
 			//log.Println(deployment)
 			if values > threshold {
 				//fmt.Printf("指标 %s超出阈值：%d \n当前值为：%d", metric, threshold, values)
-				thresholds := FormatFileSize(int64(threshold))
-				mvalue := FormatFileSize(int64(values))
+				//thresholds := FormatFileSize(int64(threshold))
+				//mvalue := FormatFileSize(int64(values))
+				thresholds := strconv.Itoa(threshold)
+				mvalue := strconv.Itoa(values)
 				alertmesage := "pod disk 使用告警\n" + "指标pod disk：" + metric + "\nPod Name：" + podName + "\nNameSpace：" + nameSpace + "\n超出阈值：" + thresholds + "\n当前值为：" + mvalue + "\n" + "详情查看：" + grafanaurl
 				log.Println(alertmesage)
 				err = SendDingtalkMessage(&config, alertmesage, atmobiles)
