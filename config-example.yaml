@@ -5,6 +5,8 @@ prometheus:
   expr: >-
    container_memory_working_set_bytes{image!="",container=~".*order-.*"}/container_spec_memory_limit_bytes{image!="",container=~".*test"} * 100
   grafanaurl: "http://grafana.soap.com"
+    #查询间隔 默认分钟
+  window: 5
 
 ding_token: xxxxxxx
 secret: xxxx

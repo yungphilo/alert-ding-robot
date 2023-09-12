@@ -1,9 +1,5 @@
 package main
 
-import (
-	"time"
-)
-
 type PrometheusMetricValue struct {
 	Status string `json:"status"`
 	Data   struct {
@@ -46,13 +42,13 @@ type PromPodDisk struct {
 }
 type Config struct {
 	PrometheusInfo struct {
-		URL       string        `yaml:"url"`
-		Metric    string        `yaml:"metric"`
-		Threshold int           `yaml:"threshold"`
-		Window    time.Duration `yaml:"window"`
-		Minute    time.Duration `yaml:"minute"`
-		Grafana   string        `yaml:"grafanaurl"`
-		Expr      string        `yaml:"expr"`
+		URL       string  `yaml:"url"`
+		Metric    string  `yaml:"metric"`
+		Threshold float64 `yaml:"threshold"`
+		Window    int     `yaml:"window"`
+		Minute    int     `yaml:"minute"`
+		Grafana   string  `yaml:"grafanaurl"`
+		Expr      string  `yaml:"expr"`
 	} `yaml:"prometheus"`
 	DingtalkWebhook string `yaml:"dingtalk_webhook"`
 	Secret          string `yaml:"secret"`
