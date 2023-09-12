@@ -9,12 +9,17 @@ import (
 
 // 发送请求获取值
 
-func GetMetricValue(pomUrl, expr string) (PromPodDisk, error) {
+func GetMetricValue(client *http.Client, pomUrl, expr string) (PromPodDisk, error) {
 	var promPodDisk PromPodDisk
 
 	url := pomUrl + url.QueryEscape(expr)
 	//url := pomUrl + metric
-	resp, err := http.Get(url)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return promPodDisk, err
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Printf("无法发送HTTP请求：%s\n", err.Error())
 		return promPodDisk, err

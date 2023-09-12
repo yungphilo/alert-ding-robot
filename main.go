@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -37,47 +38,57 @@ func main() {
 		fmt.Printf("无法读取配置文件：%s\n", err.Error())
 		return
 	}
-
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
 	// // 构建URL
 
 	pomUrl := config.PrometheusInfo.URL
-	metric := config.PrometheusInfo.Metric
-	expr := config.PrometheusInfo.Expr
 
 	for {
-		promPodDisk, err := GetMetricValue(pomUrl, expr)
-		//fmt.Println(promPodDisk)
-		atalerts := config.Atalerts
-		fmt.Println(atalerts)
-		for i := 0; i < len(promPodDisk.Data.Result); i++ {
-			value := promPodDisk.Data.Result[i].Value[1]
-			podName := promPodDisk.Data.Result[i].Metric.PodName
-			nameSpace := promPodDisk.Data.Result[i].Metric.Namespace
-			grafanaurl := config.PrometheusInfo.Grafana
-			deployment := promPodDisk.Data.Result[i].Metric.Container
-			//deployment名字为服务名字+“-” +环境变量，去掉“-”及后面的环境参数
-			service := Cutlast(deployment)
-			atmobiles := FindMobiles(service, atalerts)
-			values := GetInterfaceToFloat(value)
-			threshold := config.PrometheusInfo.Threshold
-			//log.Println(deployment)
-			if values > threshold {
-				//fmt.Printf("指标 %s超出阈值：%d \n当前值为：%d", metric, threshold, values)
-				//thresholds := FormatFileSize(int64(threshold))
-				//mvalue := FormatFileSize(int64(values))
-				thresholds := strconv.FormatFloat(threshold, 'f', 3, 64)
-				mvalue := strconv.FormatFloat(values, 'f', 3, 64)
-				// thresholds := float64(threshold)
-				// mvalue := float64(values)
-				alertmesage := "pod disk 使用告警\n" + "指标pod disk：" + metric + "\nPod Name：" + podName + "\nNameSpace：" + nameSpace + "\n超出阈值：" + thresholds + "%" + "\n当前值为：" + mvalue + "%" + "\n" + "详情查看：" + grafanaurl
-				log.Println(alertmesage)
-				err = SendDingtalkMessage(&config, alertmesage, atmobiles)
-				if err != nil {
-					log.Fatalf("Failed to send Dingtalk message: %v", err)
+		for j := 0; j < len(config.PrometheusInfo.Metrics); j++ {
+			metric := config.PrometheusInfo.Metrics[j].Metric
+			expr := config.PrometheusInfo.Metrics[j].Expr
+			grafanaurl := config.PrometheusInfo.Metrics[j].Grafana
+			threshold := config.PrometheusInfo.Metrics[j].Threshold
+			types := config.PrometheusInfo.Metrics[j].Type
+			promPodDisk, err := GetMetricValue(&client, pomUrl, expr)
+			atalerts := config.Atalerts
+			fmt.Println(atalerts)
+			for i := 0; i < len(promPodDisk.Data.Result); i++ {
+				value := promPodDisk.Data.Result[i].Value[1]
+				podName := promPodDisk.Data.Result[i].Metric.PodName
+				nameSpace := promPodDisk.Data.Result[i].Metric.Namespace
+
+				deployment := promPodDisk.Data.Result[i].Metric.Container
+				//deployment名字为服务名字+“-” +环境变量，去掉“-”及后面的环境参数
+				service := Cutlast(deployment)
+				atmobiles := FindMobiles(service, atalerts)
+				switch {
+				case types == "int":
+
 				}
-				log.Printf("Dingtalk message sent successfully! @%s", atmobiles)
-			} else {
-				log.Printf("Pod %s指标 %s未超出阈值：%.2f%% \n当前值为：%.3f%%\n", podName, metric, threshold, values)
+				values := GetInterfaceToFloat(value)
+
+				//log.Println(deployment)
+				if values > threshold {
+					//fmt.Printf("指标 %s超出阈值：%d \n当前值为：%d", metric, threshold, values)
+					//thresholds := FormatFileSize(int64(threshold))
+					//mvalue := FormatFileSize(int64(values))
+					thresholds := strconv.FormatFloat(threshold, 'f', 3, 64)
+					mvalue := strconv.FormatFloat(values, 'f', 3, 64)
+					// thresholds := float64(threshold)
+					// mvalue := float64(values)
+					alertmesage := "pod disk 使用告警\n" + "指标pod disk：" + metric + "\nPod Name：" + podName + "\nNameSpace：" + nameSpace + "\n超出阈值：" + thresholds + "%" + "\n当前值为：" + mvalue + "%" + "\n" + "详情查看：" + grafanaurl
+					log.Println(alertmesage)
+					err = SendDingtalkMessage(&config, alertmesage, atmobiles)
+					if err != nil {
+						log.Fatalf("Failed to send Dingtalk message: %v", err)
+					}
+					log.Printf("Dingtalk message sent successfully! @%s", atmobiles)
+				} else {
+					log.Printf("Pod %s指标 %s未超出阈值：%.2f%% \n当前值为：%.3f%%\n", podName, metric, threshold, values)
+				}
 			}
 		}
 		// times := config.PrometheusInfo.Window

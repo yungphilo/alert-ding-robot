@@ -42,13 +42,15 @@ type PromPodDisk struct {
 }
 type Config struct {
 	PrometheusInfo struct {
-		URL       string  `yaml:"url"`
-		Metric    string  `yaml:"metric"`
-		Threshold float64 `yaml:"threshold"`
-		Window    int     `yaml:"window"`
-		Minute    int     `yaml:"minute"`
-		Grafana   string  `yaml:"grafanaurl"`
-		Expr      string  `yaml:"expr"`
+		URL     string `yaml:"url"`
+		Metrics []struct {
+			Metric    string  `yaml:"metric"`
+			Threshold float64 `yaml:"threshold"`
+			Grafana   string  `yaml:"grafanaurl"`
+			Expr      string  `yaml:"expr"`
+			Type      string  `yaml:"type"`
+		} `yaml:"metrics"`
+		Window int `yaml:"window"`
 	} `yaml:"prometheus"`
 	DingtalkWebhook string `yaml:"dingtalk_webhook"`
 	Secret          string `yaml:"secret"`
