@@ -4,16 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 // 发送请求获取值
 
-func GetMetricValue(pomUrl, metric string) (PromPodDisk, error) {
+func GetMetricValue(client *http.Client, pomUrl, expr string) (PromPodDisk, error) {
 	var promPodDisk PromPodDisk
 
-	url := pomUrl + metric + "%7Bimage!%3D%22%22%2Ccontainer%3D%7E%22.*order-.*%22%7D%2Fcontainer_spec_memory_limit_bytes%7Bimage!%3D%22%22%2Ccontainer%3D%7E%22.*test%22%7D%20*%20100"
+	url := pomUrl + url.QueryEscape(expr)
 	//url := pomUrl + metric
-	resp, err := http.Get(url)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return promPodDisk, err
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Printf("无法发送HTTP请求：%s\n", err.Error())
 		return promPodDisk, err
