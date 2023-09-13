@@ -73,8 +73,8 @@ func compareByte(value interface{}, threshold int, metric string, podName string
 		}
 		log.Printf("Dingtalk message sent successfully! @%s", atmobiles)
 	} else {
-		mvalue := strconv.Itoa(values)
-		thresholds := strconv.Itoa(threshold)
+		mvalue := FormatFileSize(int64(values))
+		thresholds := FormatFileSize(int64(threshold))
 		log.Printf("Pod %s指标 %s未超出阈值：%s \n当前值为：%s\n", podName, metric, thresholds, mvalue)
 	}
 }
