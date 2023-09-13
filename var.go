@@ -44,11 +44,11 @@ type Config struct {
 	PrometheusInfo struct {
 		URL     string `yaml:"url"`
 		Metrics []struct {
-			Metric    string  `yaml:"metric"`
-			Threshold float64 `yaml:"threshold"`
-			Grafana   string  `yaml:"grafanaurl"`
-			Expr      string  `yaml:"expr"`
-			Type      string  `yaml:"type"`
+			Metric    string `yaml:"metric"`
+			Threshold int    `yaml:"threshold"`
+			Grafana   string `yaml:"grafanaurl"`
+			Expr      string `yaml:"expr"`
+			Type      string `yaml:"type"`
 		} `yaml:"metrics"`
 		Window int `yaml:"window"`
 	} `yaml:"prometheus"`
