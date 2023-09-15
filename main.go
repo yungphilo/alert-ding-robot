@@ -81,15 +81,9 @@ func main() {
 
 				}
 
-				//log.Println(deployment)
-
 			}
 		}
-		// times := config.PrometheusInfo.Window
-		// log.Print(config.PrometheusInfo.Window)
-		// tt := time.Duration(times.Minutes())
-		// tt := time.Duration(config.PrometheusInfo.Window) * time.Minute
-		// log.Println(tt)
+
 		time.Sleep(time.Duration(config.PrometheusInfo.Window) * time.Minute)
 
 	}

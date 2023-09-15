@@ -8,14 +8,10 @@ import (
 func compareInt(value interface{}, threshold int, metric string, podName string, nameSpace string, atmobiles []string, grafanaurl string) {
 	values := GetInterfaceToInt(value)
 	if values > threshold {
-		//fmt.Printf("指标 %s超出阈值：%d \n当前值为：%d", metric, threshold, values)
-		//thresholds := FormatFileSize(int64(threshold))
-		//mvalue := FormatFileSize(int64(values))
-		// thresholds := strconv.FormatFloat(threshold, 'f', 3, 64)
+
 		mvalue := strconv.Itoa(values)
 		thresholds := strconv.Itoa(threshold)
-		// thresholds := float64(threshold)
-		// mvalue := float64(values)
+
 		alertmesage := "pod disk 使用告警\n" + "指标pod disk：" + metric + "\nPod Name：" + podName + "\nNameSpace：" + nameSpace + "\n超出阈值：" + thresholds + "%" + "\n当前值为：" + mvalue + "%" + "\n" + "详情查看：" + grafanaurl
 		log.Println(alertmesage)
 		err := SendDingtalkMessage(&config, alertmesage, atmobiles)
@@ -34,13 +30,10 @@ func compareFloat(value interface{}, threshold int, metric string, podName strin
 	values := GetInterfaceToFloat(value)
 	thresholds := float64(threshold)
 	if values > thresholds {
-		//fmt.Printf("指标 %s超出阈值：%d \n当前值为：%d", metric, threshold, values)
-		//thresholds := FormatFileSize(int64(threshold))
-		//mvalue := FormatFileSize(int64(values))
+
 		thresholds := strconv.FormatFloat(thresholds, 'f', 3, 64)
 		mvalue := strconv.FormatFloat(values, 'f', 3, 64)
-		// thresholds := float64(threshold)
-		// mvalue := float64(values)
+
 		alertmesage := "pod disk 使用告警\n" + "指标pod disk：" + metric + "\nPod Name：" + podName + "\nNameSpace：" + nameSpace + "\n超出阈值：" + thresholds + "\n当前值为：" + mvalue + "\n" + "详情查看：" + grafanaurl
 		log.Println(alertmesage)
 		err := SendDingtalkMessage(&config, alertmesage, atmobiles)
@@ -57,14 +50,10 @@ func compareFloat(value interface{}, threshold int, metric string, podName strin
 func compareByte(value interface{}, threshold int, metric string, podName string, nameSpace string, atmobiles []string, grafanaurl string) {
 	values := GetInterfaceToInt(value)
 	if values > threshold {
-		//fmt.Printf("指标 %s超出阈值：%d \n当前值为：%d", metric, threshold, values)
+
 		thresholds := FormatFileSize(int64(threshold))
 		mvalue := FormatFileSize(int64(values))
-		// thresholds := strconv.FormatFloat(threshold, 'f', 3, 64)
-		// mvalue := strconv.Itoa(values)
-		// thresholds := strconv.Itoa(threshold)
-		// thresholds := float64(threshold)
-		// mvalue := float64(values)
+
 		alertmesage := "pod disk 使用告警\n" + "指标pod disk：" + metric + "\nPod Name：" + podName + "\nNameSpace：" + nameSpace + "\n超出阈值：" + thresholds + "%" + "\n当前值为：" + mvalue + "%" + "\n" + "详情查看：" + grafanaurl
 		log.Println(alertmesage)
 		err := SendDingtalkMessage(&config, alertmesage, atmobiles)
@@ -82,13 +71,10 @@ func comparePer(value interface{}, threshold int, metric string, podName string,
 	values := GetInterfaceToFloat(value)
 	thresholds := float64(threshold)
 	if values > thresholds {
-		//fmt.Printf("指标 %s超出阈值：%d \n当前值为：%d", metric, threshold, values)
-		//thresholds := FormatFileSize(int64(threshold))
-		//mvalue := FormatFileSize(int64(values))
+
 		thresholds := strconv.FormatFloat(thresholds, 'f', 3, 64)
 		mvalue := strconv.FormatFloat(values, 'f', 3, 64)
-		// thresholds := float64(threshold)
-		// mvalue := float64(values)
+
 		alertmesage := "pod disk 使用告警\n" + "指标pod disk：" + metric + "\nPod Name：" + podName + "\nNameSpace：" + nameSpace + "\n超出阈值：" + thresholds + "%" + "\n当前值为：" + mvalue + "%" + "\n" + "详情查看：" + grafanaurl
 		log.Println(alertmesage)
 		err := SendDingtalkMessage(&config, alertmesage, atmobiles)
