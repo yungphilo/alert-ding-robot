@@ -15,7 +15,8 @@ var config, readerr = readConfig("conf/config.yaml")
 
 func main() {
 	//日志配置
-	f, err := os.OpenFile("logs/service.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
+	logFilePath := "logs/service.log"
+	f, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
 	if err != nil {
 		fmt.Println("no logs directory，will create path ")
 		err := os.Mkdir("logs", os.ModePerm)
@@ -23,10 +24,17 @@ func main() {
 			fmt.Println(err)
 		}
 		fmt.Println("logs create")
+		f, err = os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
+
 	defer func() {
 		f.Close()
 	}()
+
 	// 组合一下即可，os.Stdout代表标准输出流
 	multiWriter := io.MultiWriter(os.Stdout, f)
 	log.SetOutput(multiWriter)

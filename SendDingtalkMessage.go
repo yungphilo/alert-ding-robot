@@ -30,7 +30,7 @@ func SendDingtalkMessage(config *Config, alertmesage string, atmobiles []string)
 	if config.Secret == "" {
 		// timestamp := time.Now().UnixNano()
 		// time := strconv.Itoa(int(timestamp))
-		dingUrl := "https://oapi.dingtalk.com/robot/send?access_token=" + config.Token
+		dingUrl := "https://oapi.dingtalk.com/robot/send?access_token=" + config.DingtalkWebhook
 		resp, err := http.Post(dingUrl, "application/json", strings.NewReader(payload))
 		if err != nil {
 			return err
@@ -48,7 +48,7 @@ func SendDingtalkMessage(config *Config, alertmesage string, atmobiles []string)
 		signSha.Write([]byte(stringToSign))
 		signData := signSha.Sum(nil)
 		sign := url.QueryEscape(base64.StdEncoding.EncodeToString(signData))
-		dingUrl := "https://oapi.dingtalk.com/robot/send?access_token=" + config.Token + "&timestamp=" + time + "&sign=" + sign
+		dingUrl := "https://oapi.dingtalk.com/robot/send?access_token=" + config.DingtalkWebhook + "&timestamp=" + time + "&sign=" + sign
 		resp, err := http.Post(dingUrl, "application/json", strings.NewReader(payload))
 		if err != nil {
 			return err

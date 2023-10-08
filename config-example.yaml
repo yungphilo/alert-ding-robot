@@ -1,6 +1,6 @@
 prometheus:
   url: "http://grafana.soap.com:9090/api/v1/query?query="
-  metircs:
+  metrics:
     - metric: process_virtual_memory_bytes
       threshold: 1173188600
       expr: >-
@@ -17,7 +17,7 @@ prometheus:
     #查询间隔 默认分钟
   window: 5
 
-ding_token: xxxxxxx
+dingtalk_webhook: xxxxxxx
 secret: xxxx
 dingmessage:
   msgtype: "text"

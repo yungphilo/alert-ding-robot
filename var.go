@@ -54,7 +54,6 @@ type Config struct {
 	} `yaml:"prometheus"`
 	DingtalkWebhook string `yaml:"dingtalk_webhook"`
 	Secret          string `yaml:"secret"`
-	Token           string `yaml:"ding_token"`
 	Message         struct {
 		MsgType string `yaml:"msgtype"`
 		Text    struct {
