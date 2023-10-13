@@ -1,20 +1,5 @@
 package main
 
-type PrometheusMetricValue struct {
-	Status string `json:"status"`
-	Data   struct {
-		ResultType string `json:"resultType"`
-		Result     []struct {
-			Metric struct {
-				Name     string `json:"__name__,omitempty"`
-				Instance string `json:"instance,omitempty"`
-				Job      string `json:"job,omitempty"`
-			} `json:"metric"`
-			Value []interface{} `json:"value"`
-		} `json:"result"`
-	} `json:"data"`
-}
-
 // pod disk info data json
 type PromPodDisk struct {
 	Status string `json:"status"`
@@ -44,11 +29,15 @@ type Config struct {
 	PrometheusInfo struct {
 		URL     string `yaml:"url"`
 		Metrics []struct {
-			Metric    string `yaml:"metric"`
-			Threshold int    `yaml:"threshold"`
-			Grafana   string `yaml:"grafanaurl"`
-			Expr      string `yaml:"expr"`
-			Type      string `yaml:"type"`
+			Metric    string   `yaml:"metric"`
+			Threshold int      `yaml:"threshold"`
+			Grafana   string   `yaml:"grafanaurl"`
+			Expr      string   `yaml:"expr"`
+			Type      string   `yaml:"type"`
+			Factor    string   `yaml:"factor"`
+			Source    string   `yaml:"source"`
+			Atuser    []string `yaml:"atuserphone"`
+			AlertName string   `yaml:"alertname"`
 		} `yaml:"metrics"`
 		Window int `yaml:"window"`
 	} `yaml:"prometheus"`

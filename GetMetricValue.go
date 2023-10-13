@@ -12,7 +12,7 @@ import (
 func GetMetricValue(client *http.Client, pomUrl, expr string) (PromPodDisk, error) {
 	var promPodDisk PromPodDisk
 
-	url := pomUrl + url.QueryEscape(expr)
+	url := pomUrl + "/api/v1/query?query=" + url.QueryEscape(expr)
 	//url := pomUrl + metric
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -25,7 +25,6 @@ func GetMetricValue(client *http.Client, pomUrl, expr string) (PromPodDisk, erro
 		return promPodDisk, err
 	}
 	defer resp.Body.Close()
-	// var prometheusMetricValue PrometheusMetricValue
 	err = json.NewDecoder(resp.Body).Decode(&promPodDisk)
 	if err != nil {
 		fmt.Printf("无法解析http响应：%s\n", err.Error())

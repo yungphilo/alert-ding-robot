@@ -1,5 +1,5 @@
 prometheus:
-  url: "http://grafana.soap.com:9090/api/v1/query?query="
+  url: "http://grafana.soap.com:9090"
   metrics:
     - metric: process_virtual_memory_bytes
       threshold: 1173188600
@@ -8,6 +8,11 @@ prometheus:
       grafanaurl: "http://grafana.soap.com"
       #指标数据类型目前只有四种 int float byte per
       type: per
+      #大于、小于、无数据: above below none
+      factor: below
+      source: job
+      atuserphone:
+      - 1xxxxxxxxxx
     - metric: container_fs_usage_bytes
       expr: >-
         container_fs_usage_bytes{job="_arms/kubelet/cadvisor", device=~"^/dev/.*",pod=~".*order.*",container!="POD"}
@@ -16,7 +21,7 @@ prometheus:
       grafanaurl: "https:grafana.soap.com"
     #查询间隔 默认分钟
   window: 5
-
+# webhook token  不需要域名地址
 dingtalk_webhook: xxxxxxx
 secret: xxxx
 dingmessage:

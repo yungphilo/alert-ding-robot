@@ -56,18 +56,25 @@ func main() {
 	// // 构建URL
 
 	pomUrl := config.PrometheusInfo.URL
-
 	for {
-		for j := 0; j < len(config.PrometheusInfo.Metrics); j++ {
-			metric := config.PrometheusInfo.Metrics[j].Metric
-			expr := config.PrometheusInfo.Metrics[j].Expr
-			grafanaurl := config.PrometheusInfo.Metrics[j].Grafana
-			threshold := config.PrometheusInfo.Metrics[j].Threshold
-			types := config.PrometheusInfo.Metrics[j].Type
+		now := time.Now()
+
+		//today := now.Truncate(24 * time.Hour)
+		start := time.Date(now.Year(), now.Month(), now.Day(), 17, 0, 0, 0, now.Location())
+		end := time.Date(now.Year(), now.Month(), now.Day(), 18, 0, 0, 0, now.Location())
+		if now.After(start) && now.Before(end) {
+			metric := config.PrometheusInfo.Metrics[1].Metric
+			expr := config.PrometheusInfo.Metrics[1].Expr
+			grafanaurl := config.PrometheusInfo.Metrics[1].Grafana
+			threshold := config.PrometheusInfo.Metrics[1].Threshold
+			types := config.PrometheusInfo.Metrics[1].Type
+			alertname := config.PrometheusInfo.Metrics[1].AlertName
 			promPodDisk, err := GetMetricValue(&client, pomUrl, expr)
 			log.Println(err)
 			atalerts := config.Atalerts
 			fmt.Println(atalerts)
+			factor := config.PrometheusInfo.Metrics[1].Factor
+			source := config.PrometheusInfo.Metrics[1].Source
 			for i := 0; i < len(promPodDisk.Data.Result); i++ {
 				value := promPodDisk.Data.Result[i].Value[1]
 				podName := promPodDisk.Data.Result[i].Metric.PodName
@@ -77,25 +84,87 @@ func main() {
 				//deployment名字为服务名字+“-” +环境变量，去掉“-”及后面的环境参数
 				service := Cutlast(deployment)
 				atmobiles := FindMobiles(service, atalerts)
-				switch {
-				case types == "int":
-					compareInt(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
-				case types == "float":
-					compareFloat(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
-				case types == "byte":
-					compareByte(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
-				case types == "per":
-					comparePer(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
+				if source == "k8s" {
+					switch {
+					case types == "int":
+						compareInt(value, threshold, metric, podName, nameSpace, atmobiles, factor, grafanaurl)
+					case types == "float":
+						compareFloat(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
+					case types == "byte":
+						compareByte(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
+					case types == "per":
+						comparePer(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
 
+					}
+				} else {
+					atmobiles = config.PrometheusInfo.Metrics[1].Atuser
+					switch {
+					case types == "int":
+						jobcompareInt(value, threshold, alertname, atmobiles, factor, grafanaurl)
+					case types == "float":
+						jobcompareFloat(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
+					case types == "byte":
+						jobcompareByte(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
+					case types == "per":
+						jobcomparePer(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
+
+					}
+				}
+
+			}
+		} else {
+			metric := config.PrometheusInfo.Metrics[0].Metric
+			expr := config.PrometheusInfo.Metrics[0].Expr
+			grafanaurl := config.PrometheusInfo.Metrics[0].Grafana
+			threshold := config.PrometheusInfo.Metrics[0].Threshold
+			types := config.PrometheusInfo.Metrics[0].Type
+			alertname := config.PrometheusInfo.Metrics[0].AlertName
+			promPodDisk, err := GetMetricValue(&client, pomUrl, expr)
+			log.Println(err)
+			atalerts := config.Atalerts
+			fmt.Println(atalerts)
+			factor := config.PrometheusInfo.Metrics[0].Factor
+			source := config.PrometheusInfo.Metrics[0].Source
+			for i := 0; i < len(promPodDisk.Data.Result); i++ {
+				value := promPodDisk.Data.Result[i].Value[1]
+				podName := promPodDisk.Data.Result[i].Metric.PodName
+				nameSpace := promPodDisk.Data.Result[i].Metric.Namespace
+
+				deployment := promPodDisk.Data.Result[i].Metric.Container
+				//deployment名字为服务名字+“-” +环境变量，去掉“-”及后面的环境参数
+				service := Cutlast(deployment)
+				atmobiles := FindMobiles(service, atalerts)
+				if source == "k8s" {
+					switch {
+					case types == "int":
+						compareInt(value, threshold, metric, podName, nameSpace, atmobiles, factor, grafanaurl)
+					case types == "float":
+						compareFloat(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
+					case types == "byte":
+						compareByte(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
+					case types == "per":
+						comparePer(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
+
+					}
+				} else {
+					atmobiles = config.PrometheusInfo.Metrics[0].Atuser
+					switch {
+					case types == "int":
+						jobcompareInt(value, threshold, alertname, atmobiles, factor, grafanaurl)
+					case types == "float":
+						jobcompareFloat(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
+					case types == "byte":
+						jobcompareByte(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
+					case types == "per":
+						jobcomparePer(value, threshold, metric, podName, nameSpace, atmobiles, grafanaurl)
+
+					}
 				}
 
 			}
 		}
-
 		time.Sleep(time.Duration(config.PrometheusInfo.Window) * time.Minute)
-
 	}
-
 }
 
 func readConfig(filename string) (Config, error) {
